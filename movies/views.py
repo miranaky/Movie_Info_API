@@ -34,7 +34,7 @@ class MovieListView(ListModelMixin, CreateModelMixin, GenericAPIView):
             genre = Genre.objects.get(name=genres)
             filter_kwargs["genres"] = genre
 
-        # queryset = queryset.filter(**filter_kwargs)
+        queryset = queryset.filter(**filter_kwargs)
         # if rating == "ascending":
         #     queryset = queryset.annotate(ordering=F("rating")).order_by("ordering")
         # if rating == "descending":
