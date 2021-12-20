@@ -1,9 +1,12 @@
 from typing import OrderedDict
-import pytest
+
 from django.test import TestCase
-from model_bakery import baker
+
 from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
+
+import pytest
+from model_bakery import baker
 
 from movies.models import Genre, Movie
 from movies.serializers import MovieSerializer
