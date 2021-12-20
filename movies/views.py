@@ -1,4 +1,4 @@
-from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveAPIView
+from rest_framework.generics import GenericAPIView, RetrieveAPIView
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework.permissions import AllowAny
 
@@ -40,3 +40,9 @@ class MovieListView(ListModelMixin, CreateModelMixin, GenericAPIView):
         # if rating == "descending":
         #     queryset = queryset.annotate(ordering=F("rating")).order_by("-ordering")
         return super().filter_queryset(queryset)
+
+
+class MovieView(RetrieveAPIView):
+    queryset = Movie.objects.all()
+    permision_classes = [AllowAny]
+    serializer_class = MovieDetailSerializer

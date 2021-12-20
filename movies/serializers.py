@@ -14,3 +14,12 @@ class MovieSerializer(ModelSerializer):
             "id",
             "rating",
         )
+
+
+class MovieDetailSerializer(ModelSerializer):
+    genres = StringRelatedField(many=True)
+    reviews = ReviewSerializer(many=True)
+
+    class Meta:
+        model = Movie
+        fields = ("id", "title", "year", "rating", "genres", "summary", "reviews")
