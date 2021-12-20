@@ -11,3 +11,10 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.movie_id}-{self.text}"
+
+
+class ReviewVote(models.Model):
+    review_id = models.ForeignKey("Review", related_name="review_vote", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.review_id.id)
