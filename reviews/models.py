@@ -15,8 +15,6 @@ class Review(models.Model):
     @property
     def vote(self):
         vote = self.review_vote.count()
-        if vote is None:
-            return 0
         return vote
 
 
