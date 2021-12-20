@@ -1,3 +1,5 @@
+from django.db.models import Avg
+
 from rest_framework.generics import GenericAPIView, RetrieveAPIView
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework.permissions import AllowAny
@@ -40,6 +42,7 @@ class MovieListView(ListModelMixin, CreateModelMixin, GenericAPIView):
         title = self.request.query_params.get("title")
         year = self.request.query_params.get("year")
         genres = self.request.query_params.get("genres")
+        order = self.request.query_params.get("order")
         filter_kwargs = {}
         if title is not None:
             filter_kwargs["title__icontains"] = title
@@ -50,6 +53,11 @@ class MovieListView(ListModelMixin, CreateModelMixin, GenericAPIView):
             filter_kwargs["genres"] = genre
 
         queryset = queryset.filter(**filter_kwargs)
+
+        if order == "ascending":
+            queryset = queryset.annotate(avg_rate=Avg("reviews__rating")).order_by("avg_rate")
+        if order == "descending":
+            queryset = queryset.annotate(avg_rate=Avg("reviews__rating")).order_by("-avg_rate")
         return super().filter_queryset(queryset)
 
 
