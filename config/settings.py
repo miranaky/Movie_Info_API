@@ -1,5 +1,4 @@
 import os
-
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -29,7 +28,10 @@ DJANGO_APPS = [
 ]
 THRID_PARTY_APPS = []
 
-PROJECT_APPS = []
+PROJECT_APPS = [
+    "movies.apps.MoviesConfig",
+    "reviews.apps.ReviewsConfig",
+]
 
 INSTALLED_APPS = DJANGO_APPS + THRID_PARTY_APPS + PROJECT_APPS
 
