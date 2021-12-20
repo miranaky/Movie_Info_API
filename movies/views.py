@@ -1,14 +1,12 @@
 from django.db.models import Avg
-
+from rest_framework import status
 from rest_framework.generics import GenericAPIView, RetrieveAPIView
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework.permissions import AllowAny
-from rest_framework import status
 from rest_framework.response import Response
 
-from movies.models import Movie, Genre
-
-from movies.serializers import MovieSerializer, MovieDetailSerializer
+from movies.models import Genre, Movie
+from movies.serializers import MovieDetailSerializer, MovieSerializer
 
 
 class MovieListView(ListModelMixin, CreateModelMixin, GenericAPIView):
@@ -28,7 +26,9 @@ class MovieListView(ListModelMixin, CreateModelMixin, GenericAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer, genres)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     def perform_create(self, serializer, genres):
         _genres = []
@@ -55,9 +55,13 @@ class MovieListView(ListModelMixin, CreateModelMixin, GenericAPIView):
         queryset = queryset.filter(**filter_kwargs)
 
         if order == "ascending":
-            queryset = queryset.annotate(avg_rate=Avg("reviews__rating")).order_by("avg_rate")
+            queryset = queryset.annotate(avg_rate=Avg("reviews__rating")).order_by(
+                "avg_rate"
+            )
         if order == "descending":
-            queryset = queryset.annotate(avg_rate=Avg("reviews__rating")).order_by("-avg_rate")
+            queryset = queryset.annotate(avg_rate=Avg("reviews__rating")).order_by(
+                "-avg_rate"
+            )
         return super().filter_queryset(queryset)
 
 
