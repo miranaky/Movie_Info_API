@@ -12,11 +12,13 @@ class ReviewSerializer(ModelSerializer):
             "rating",
             "created_at",
             "updated_at",
+            "vote",
         )
         read_only_fields = (
             "id",
             "created_at",
             "updated_at",
+            "vote",
         )
 
 
