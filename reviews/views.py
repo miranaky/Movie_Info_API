@@ -1,15 +1,23 @@
 from rest_framework.generics import CreateAPIView, DestroyAPIView, GenericAPIView
-from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
+from rest_framework.mixins import (
+    CreateModelMixin,
+    DestroyModelMixin,
+    RetrieveModelMixin,
+    UpdateModelMixin,
+)
 from rest_framework.permissions import AllowAny
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
 
 from reviews.models import Review, ReviewVote
-from reviews.serializers import ReviewSerializer, ReviewWriteSerializer, ReviewVoteSerializer
+from reviews.serializers import (
+    ReviewSerializer,
+    ReviewVoteSerializer,
+    ReviewWriteSerializer,
+)
 
 
-class ReviewDetailView(RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin, GenericAPIView):
+class ReviewDetailView(
+    RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin, GenericAPIView
+):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_class = [AllowAny]
