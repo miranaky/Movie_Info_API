@@ -5,7 +5,7 @@ from reviews.serializers import ReviewSerializer
 
 
 class MovieSerializer(ModelSerializer):
-    genres = StringRelatedField(many=True)
+    genres = StringRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Movie

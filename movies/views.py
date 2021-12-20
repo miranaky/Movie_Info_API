@@ -1,7 +1,8 @@
 from rest_framework.generics import GenericAPIView, RetrieveAPIView
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework.permissions import AllowAny
-
+from rest_framework import status
+from rest_framework.response import Response
 
 from movies.models import Movie, Genre
 
@@ -19,10 +20,24 @@ class MovieListView(ListModelMixin, CreateModelMixin, GenericAPIView):
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
+    def create(self, request, *args, **kwargs):
+        genres = request.data.pop("genres")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer, genres)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer, genres):
+        _genres = []
+        for genre in genres:
+            _genre, _ = Genre.objects.get_or_create(name=genre)
+            _genres.append(_genre.id)
+        serializer.save(genres=_genres)
+
     def filter_queryset(self, queryset):
         # get query parms
         title = self.request.query_params.get("title")
-        rating = self.request.query_params.get("rating")
         year = self.request.query_params.get("year")
         genres = self.request.query_params.get("genres")
         filter_kwargs = {}
@@ -35,10 +50,6 @@ class MovieListView(ListModelMixin, CreateModelMixin, GenericAPIView):
             filter_kwargs["genres"] = genre
 
         queryset = queryset.filter(**filter_kwargs)
-        # if rating == "ascending":
-        #     queryset = queryset.annotate(ordering=F("rating")).order_by("ordering")
-        # if rating == "descending":
-        #     queryset = queryset.annotate(ordering=F("rating")).order_by("-ordering")
         return super().filter_queryset(queryset)
 
 
