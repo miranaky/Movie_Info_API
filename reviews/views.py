@@ -1,9 +1,12 @@
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import CreateAPIView, DestroyAPIView, GenericAPIView
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
 from rest_framework.permissions import AllowAny
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
-from reviews.models import Review
-from reviews.serializers import ReviewSerializer, ReviewWriteSerializer
+from reviews.models import Review, ReviewVote
+from reviews.serializers import ReviewSerializer, ReviewWriteSerializer, ReviewVoteSerializer
 
 
 class ReviewDetailView(RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin, GenericAPIView):
@@ -31,3 +34,15 @@ class ReviewCreateUpdateDeleteView(CreateModelMixin, GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
+
+
+class ReviewVoteCreateView(CreateAPIView):
+    queryset = ReviewVote.objects.all()
+    serializer_class = ReviewVoteSerializer
+    permission_class = [AllowAny]
+
+
+class ReviewVoteDeleteView(DestroyAPIView):
+    queryset = ReviewVote.objects.all()
+    serializer_class = ReviewVoteSerializer
+    permission_class = [AllowAny]
