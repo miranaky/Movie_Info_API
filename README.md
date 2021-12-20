@@ -28,7 +28,7 @@ $ pip install -r requirements.txt
 # Django Secret Key 설정
 $ export DJANGO_SECRET_KEY=9-uu5+qa*wgtlsj27jvmta04cqim7kd@1zuz4^+rd7j5@
 # DB migrate
-$ python manage.py magrate
+$ python manage.py migrate
 # 서버 실행
 $ python manage.py runserver 0.0.0.0:8800
 # YTS 사이트에서 영화 정보 수집 및 저장
