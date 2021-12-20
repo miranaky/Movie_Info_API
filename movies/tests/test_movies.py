@@ -1,9 +1,12 @@
 from typing import OrderedDict
-import pytest
+
 from django.test import TestCase
-from model_bakery import baker
+
 from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
+
+import pytest
+from model_bakery import baker
 
 from movies.models import Genre, Movie
 from movies.serializers import MovieSerializer
@@ -84,6 +87,34 @@ class TestMovieSerializer(TestCase):
 
 
 class TestMovieInfoView(APITestCase):
+    def create_movies(self):
+        movie_data = [
+            {
+                "title": "Life of Pi",
+                "year": "2012",
+                "genres": ["Drama", "Adventure"],
+                "summary": "Life of Pi is a 2012 adventure drama film[11] based on Yann Martel's 2001 novel of the same name.",
+            },
+            {
+                "title": "CoCo",
+                "year": "2017",
+                "genres": ["Animation", "Adventure"],
+                "summary": "Coco is a 2017 American computer-animated fantasy film produced by Pixar Animation Studios and released by Walt Disney Pictures.",
+            },
+        ]
+        for input_json in movie_data:
+            self.client.post(self.url, data=input_json, format="json")
+
+    def create_reviews(self):
+        review_url = "/api/v1/reviews/"
+        review_data = [
+            {"movie_id": 1, "text": "Bad Movie", "rating": 2},
+            {"movie_id": 2, "text": "Greate Movie", "rating": 10},
+            {"movie_id": 3, "text": "Good Movie", "rating": 7},
+        ]
+        for review in review_data:
+            self.client.post(review_url, review, format="json")
+
     @pytestmark
     def setUp(self) -> None:
         self.client = APIClient()
@@ -117,6 +148,25 @@ class TestMovieInfoView(APITestCase):
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(response.data["results"][0], OrderedDict(result))
 
+    def test_get_movie_detail(self):
+        url = f"{self.url}1/"
+        response = self.client.get(url, content_type="application/json")
+        result = {
+            "id": 1,
+            "title": "The Fire",
+            "year": "2019",
+            "rating": 0,
+            "genres": [
+                "Documentary",
+                "History",
+            ],
+            "summary": "Fire is anywhere. It is problem.",
+            "reviews": [],
+        }
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["id"], 1)
+        self.assertEqual(response.data, OrderedDict(result))
+
     @pytestmark
     def test_post_movie(self):
         input_json = {
@@ -145,7 +195,66 @@ class TestMovieInfoView(APITestCase):
 
     @pytestmark
     def test_search_movie_genre(self):
+        url = f"{self.url}?genres=History"
+        response = self.client.get(url, content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+
+    @pytestmark
+    def test_search_movie_genre_not_exist(self):
         url = f"{self.url}?genres=Horror"
         response = self.client.get(url, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 0)
+
+    @pytestmark
+    def test_search_movie_year(self):
+        url = f"{self.url}?year=2021"
+        response = self.client.get(url, content_type="application/json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 0)
+
+    @pytestmark
+    def test_order_by_rating_descending(self):
+        # create new movies
+        self.create_movies()
+        # create new reviiews
+        self.create_reviews()
+        # create reviews for order by rating
+        url = f"{self.url}?order=descending"
+        response = self.client.get(url, content_type="application/json")
+        result = {
+            "id": 2,
+            "title": "Life of Pi",
+            "year": "2012",
+            "rating": 10,
+            "genres": ["Drama", "Adventure"],
+            "summary": "Life of Pi is a 2012 adventure drama film[11] based on Yann Martel's 2001 novel of the same name.",
+        }
+        print(response.data["results"][0])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["results"][0], OrderedDict(result))
+
+    @pytestmark
+    def test_order_by_rating_ascending(self):
+        # create new movies
+        self.create_movies()
+        # create new reviiews
+        self.create_reviews()
+        # create reviews for order by rating
+        url = f"{self.url}?order=ascending"
+        response = self.client.get(url, content_type="application/json")
+        result = {
+            "id": 1,
+            "title": "The Fire",
+            "year": "2019",
+            "rating": 2,
+            "genres": [
+                "Documentary",
+                "History",
+            ],
+            "summary": "Fire is anywhere. It is problem.",
+        }
+        print(response.data["results"][0])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["results"][0], OrderedDict(result))
