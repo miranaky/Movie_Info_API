@@ -71,3 +71,18 @@ $ python manage.py get_movies
 
 10. Test Code
 11. YTS 사이트에서 영화 정보 수집 및 저장
+
+    ```bash
+    #get_movies 사용법
+    $ python manage.py get_movies --help
+    usage: manage.py get_movies [-h] [--limit LIMIT] [--max_page MAX_PAGE]
+
+    This command creates movies from yts.mx
+
+    optional arguments:
+    -h, --help            show this help message and exit
+    --limit LIMIT         The limit of movie results per page that has been set
+    --max_page MAX_PAGE   Page to explore as much as possible
+    # 사용 예
+    $ python manage.py get_movies --limit=30 --max_page=5
+    ```
