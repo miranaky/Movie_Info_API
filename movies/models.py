@@ -19,7 +19,7 @@ class Movie(models.Model):
         rating = self.reviews.all().aggregate(models.Avg("rating")).get("rating__avg")
         if rating is None:
             rating = 0
-        return rating
+        return round(rating, 1)
 
     def __str__(self):
         return self.title
